@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Calendar</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  
+  <style>
+    /* Additional custom styles here */
+    body{
+        background-color: #5484a2;
+    }
+    .calendar-cell:hover {
+      background-color: #9ec0d4;
+      cursor: pointer;
+    }
+    .table .thead-light th{
+        background-color:#d4d7db;
+        border-color: #9eafc1;
+    }
+    .table {
+        background-color: #b6cade;
+    }
+    
+
+    .event-container {
+      position: relative;
+    }
+
+    .event-badge {
+      position: relative;
+      width: inherit;
+      padding: 2px 6px;
+      border-radius: 5px;
+      background-color: #4198f4;
+      color: #fff;
+      font-size: 12px;
+      margin-top: 4px;
+      margin-right: 5px;
+      display: inline-block;
+    }
+
+    .delete-button {
+      cursor: pointer;
+      color: rgb(251, 70, 70);
+      font-size: 15px;
+      margin-left: 10px;
+    }
+.table-bordered{
+    height: 650px;
+}
+.calendar-cell{
+    font-weight: 500;
+    color: rgb(88, 87, 87);
+}
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1 style="text-align: center; margin: 40px;">Calendar</h1>
+    <table class="table table-bordered">
+      <thead class="thead-light">
+        <tr>
+          <th>Sun</th>
+          <th>Mon</th>
+          <th>Tue</th>
+          <th>Wed</th>
+          <th>Thu</th>
+          <th>Fri</th>
+          <th>Sat</th>
+        </tr>
+      </thead>
+      <tbody id="calendar-body">
+        <!-- Calendar rows will be dynamically generated here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+  <script>
+    // Generate the calendar
+    function generateCalendar() {
+      // Clear the existing calendar
+      document.getElementById("calendar-body").innerHTML = "";
+
+      // Get the current date
+      var currentDate = new Date();
+
+      // Set the current month and year
+      var currentMonth = currentDate.getMonth();
+      var currentYear = currentDate.getFullYear();
+
+      // Get the first day of the current month
+      var firstDay = new Date(currentYear, currentMonth, 1);
+
+      // Determine the number of days in the current month
+      var lastDay = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+      // Start creating the calendar rows
+      var calendarBody = document.getElementById("calendar-body");
+      var date = 1;
+      for (var i = 0; i < 6; i++) {
+        var row = document.createElement("tr");
+
+        // Create cells for each day of the week
+        for (var j = 0; j < 7; j++) {
+          var cell = document.createElement("td");
+          cell.className = "calendar-cell";
+          if (i === 0 && j < firstDay.getDay()) {
+            // Empty cells before the first day of the month
+            cell.textContent = "";
+          } else if (date > lastDay) {
+            // Empty cells after the last day of the month
+            cell.textContent = "";
+          } else {
+            // Fill in the date
+            cell.textContent = date;
+
+            // Create event container
+            var eventContainer = document.createElement("div");
+            eventContainer.className = "event-container";
+
+            // Add event listener to the cell
+            (function (selectedDate, eventContainer) {
+              cell.addEventListener("click", function () {
+                var eventText = prompt("Enter event for " + selectedDate.toDateString() + ":");
+                if (eventText) {
+                  addEvent(selectedDate, eventText, eventContainer);
+                }
+              });
+            })(new Date(currentYear, currentMonth, date), eventContainer);
+
+            // Append event container to cell
+            cell.appendChild(eventContainer);
+
+            date++;
+          }
+          row.appendChild(cell);
+        }
+
+        calendarBody.appendChild(row);
+
+        // Stop generating rows if we have reached the end of the month
+        if (date > lastDay) {
+          break;
+        }
+      }
+    }
+
+    // Add an event to the event container
+    function addEvent(date, eventText, eventContainer) {
+      var eventBadge = document.createElement("span");
+      eventBadge.className = "event-badge";
+      eventBadge.textContent = eventText;
+
+      var deleteButton = document.createElement("span");
+      deleteButton.className = "delete-button";
+       deleteButton.innerHTML = '&times;';
+      deleteButton.addEventListener("click", function (event) {
+        event.stopPropagation();
+        deleteEvent(eventBadge);
+      });
+
+      eventBadge.appendChild(deleteButton);
+      eventContainer.appendChild(eventBadge);
+    }
+
+    // Delete an event from the event container
+    function deleteEvent(eventBadge) {
+      eventBadge.parentNode.removeChild(eventBadge);
+    }
+
+    // Call the function to generate the initial calendar
+    generateCalendar();
+  </script>
+</body>
+
+</html>
